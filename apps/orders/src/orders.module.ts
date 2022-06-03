@@ -8,6 +8,7 @@ import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { Order, OrderSchema } from './schemas/order.schema';
 import { BILLING_SERVICE } from './constants/services';
+import { AuthModule } from '@app/common';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { BILLING_SERVICE } from './constants/services';
     RmqModule.register({
       name: BILLING_SERVICE,
     }),
+    AuthModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersRepository],

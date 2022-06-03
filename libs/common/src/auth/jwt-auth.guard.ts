@@ -13,21 +13,22 @@ import { catchError, Observable, tap } from 'rxjs';
 export class JwtAuthGuard implements CanActivate {
   constructor(@Inject(AUTH_SERVICE) private authClient: ClientProxy) {}
 
-  async canActivate(
+  canActivate(
     context: ExecutionContext,
-  ): Promise<boolean> | boolean | Observable<boolean> {
+  ): boolean | Promise<boolean> | Observable<boolean> {
     const authentication = this.getAuthentication(context);
-
-
-    return this.authClient.send('validate_user', {
+    return this.authClient
+      .send('validate_user', {
         Authentication: authentication,
-        }).pipe(
-            tap((res) =>{
-                this.addUser(res, context)
-            }),
-            catchError(()=>{
-                throw new UnauthorizedException();
-            })
+      })
+      .pipe(
+        tap((res) => {
+          this.addUser(res, context);
+        }),
+        catchError(() => {
+          throw new UnauthorizedException();
+        }),
+      );
   }
 
   private getAuthentication(context: ExecutionContext) {
@@ -50,10 +51,10 @@ export class JwtAuthGuard implements CanActivate {
   }
 
   private addUser(user: any, context: ExecutionContext) {
-    if(context.getType() === 'rpc'){
-        context.switchToRpc().getData().user = user;
-    }else if(context.getType() === 'http'){
-        context.switchToHttp().getRequest().user = user;
+    if (context.getType() === 'rpc') {
+      context.switchToRpc().getData().user = user;
+    } else if (context.getType() === 'http') {
+      context.switchToHttp().getRequest().user = user;
     }
   }
 }
